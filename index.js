@@ -11,7 +11,7 @@ const server = http.createServer((req, res) => {
   res.end("Hello, World!\n");
 });
 
-cron.schedule("0 9 * * *", async () => {
+cron.schedule("30 * * * *", async () => {
   const checkStatus = await runPuppeteer("https://jakegifford.co.uk/");
 
   console.log("Website check", checkStatus);
