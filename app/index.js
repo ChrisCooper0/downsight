@@ -10,15 +10,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// Handle GET requests to /messages
-app.get("/messages", (req, res) => {
-  console.log("Received a PUT request to /");
-  // Handle the PUT request here
-
-  // Send a response (you can customize this based on your requirements)
-  res.status(200).send("Message successfully updated");
-});
-
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -45,7 +36,7 @@ const sendFailEmail = () => {
 };
 
 // 09:00 every day
-cron.schedule("* 9 * * *", async () => {
+cron.schedule("* * * * *", async () => {
   const checkStatus = await runPuppeteer(process.env.WEBSITE_TO_CHECK);
 
   if (checkStatus === "Failed") {
@@ -54,6 +45,14 @@ cron.schedule("* 9 * * *", async () => {
 
   console.log("Website check", checkStatus);
 });
+
+const checkStatus = await runPuppeteer(process.env.WEBSITE_TO_CHECK);
+
+if (checkStatus === "Failed") {
+  sendFailEmail();
+}
+
+console.log("Website check", checkStatus);
 
 // Start the server
 app.listen(PORT, () => {
