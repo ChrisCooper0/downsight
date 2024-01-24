@@ -1,16 +1,22 @@
-import runPuppeteer from "./app/puppeteer.js";
+import express from "express";
+import runPuppeteer from "./puppeteer.js";
 import cron from "node-cron";
-import http from "node:http";
 import nodemailer from "nodemailer";
 import "dotenv/config";
+import cors from "cors";
 
-const hostname = "127.0.0.1";
-const port = 3000;
+const app = express();
+const port = 5500;
 
-const server = http.createServer((_req, res) => {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/plain");
-  res.end("Hello, World!\n");
+app.use(cors());
+
+// Handle GET requests to /messages
+app.get("/messages", (req, res) => {
+  console.log("Received a PUT request to /");
+  // Handle the PUT request here
+
+  // Send a response (you can customize this based on your requirements)
+  res.status(200).send("Message successfully updated");
 });
 
 const transporter = nodemailer.createTransport({
@@ -40,7 +46,7 @@ const sendFailEmail = () => {
 
 // 09:00 every day
 cron.schedule("* 9 * * *", async () => {
-  const checkStatus = await runPuppeteer("https://jakegifford.co.uk/");
+  const checkStatus = await runPuppeteer(process.env.WEBSITE_TO_CHECK);
 
   if (checkStatus === "Failed") {
     sendFailEmail();
@@ -49,6 +55,7 @@ cron.schedule("* 9 * * *", async () => {
   console.log("Website check", checkStatus);
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/ 🚀`);
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });
